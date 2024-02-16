@@ -1,41 +1,40 @@
-# docker run -d -it --name mi-mongo --net mi-red -mount source=mi-volumen, target=/data/db mongo
+# docker run -d --name mi-mysql -v mi-mysql-vol:/var/lib/mysql --net mi-mysql-red --ip 172.25.0.2 -e MYSQL_ROOT_PASSWORD=2daw mongo
 services:
   mi-mysql:
     image: mysql
-    container_name: mi-mysql # --name mi-daw-12
+    container_name: mi-mysql # --name mi-mysql
     stdin_open: true # -i
     tty: true # -t
     networks:
-      mi-mysql-red: # --net mi-red
-        ipv4_address: 172.25.0.2 # --ip 172.100.0.10
+      mi-mysql-red: # --net mi-mysql-red
+        ipv4_address: 172.25.0.2 # --ip 172.25.0.2
     volumes:
-      - mi-mysql-vol:/var/lib/mysql # -mount source=mi-vol, target=/app/data
+      - mi-mysql-vol:/var/lib/mysql # -v mi-mysql-vol:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=2daw
+      - MYSQL_ROOT_PASSWORD=2daw # -e MYSQL_ROOT_PASSWORD=2daw
 
+# docker run --name mi-dashboard --net mi-mysql-red -d -p 8080:80 -e PMA_HOST=172.25.0.2 -e PMA_PORT=3306 -e PMA_USER=root -e PMA_PASSWORD=2daw phpmyadmin/phpmyadmin
   mi-dashboard:
     image: phpmyadmin/phpmyadmin
-    container_name: mi-dashboard # --name mi-daw-12
+    container_name: mi-dashboard # --name mi-dashboard
     stdin_open: true # -i
     tty: true # -t
     networks:
-      mi-mysql-red: # --net mi-red
+      mi-mysql-red: # --net mi-mysql-red
     ports:
-      - "8080:80"
+      - "8080:80" # -p 8080:80
     environment:
-      - PMA_HOST=172.25.0.2
-      - PMA_PORT=3306
-      - PMA_USER=root
-      - PMA_PASSWORD=2daw
+      - PMA_HOST=172.25.0.2 # -e PMA_HOST=172.25.0.2
+      - PMA_PORT=3306 # -e PMA_PORT=3306
+      - PMA_USER=root # -e PMA_USER=root
+      - PMA_PASSWORD=2daw # -e PMA_PASSWORD=2daw
     
 networks:
   mi-mysql-red:
     ipam:
       driver: default # --driver bridge
       config:
-        - subnet: 172.25.0.0/16 # --subnet 172.100.0.0/16
+        - subnet: 172.25.0.0/16 # --subnet 172.25.0.0/16
       
 volumes:
   mi-mysql-vol:
-
-
